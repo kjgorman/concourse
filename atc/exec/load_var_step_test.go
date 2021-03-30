@@ -9,7 +9,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
-	"go.opentelemetry.io/otel/api/trace"
 
 	"github.com/concourse/concourse/atc"
 	"github.com/concourse/concourse/atc/exec"
@@ -17,6 +16,7 @@ import (
 	"github.com/concourse/concourse/atc/exec/build/buildfakes"
 	"github.com/concourse/concourse/atc/exec/execfakes"
 	"github.com/concourse/concourse/atc/worker/workerfakes"
+	"github.com/concourse/concourse/tracing"
 )
 
 const plainString = "  pv  \n\n"
@@ -89,7 +89,7 @@ var _ = Describe("LoadVarStep", func() {
 		fakeDelegate.StderrReturns(stderr)
 
 		spanCtx = context.Background()
-		fakeDelegate.StartSpanReturns(spanCtx, trace.NoopSpan{})
+		fakeDelegate.StartSpanReturns(spanCtx, tracing.NoopSpan)
 
 		fakeDelegateFactory = new(execfakes.FakeBuildStepDelegateFactory)
 		fakeDelegateFactory.BuildStepDelegateReturns(fakeDelegate)
