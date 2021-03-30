@@ -11,15 +11,18 @@ import (
 type Process struct {
 	process     containerd.Process
 	exitStatusC <-chan containerd.ExitStatus
+	stdin       *stdinWrapper
 }
 
 func NewProcess(
 	p containerd.Process,
 	ch <-chan containerd.ExitStatus,
+	in *stdinWrapper,
 ) *Process {
 	return &Process{
 		process:     p,
 		exitStatusC: ch,
+		stdin:       in,
 	}
 }
 
@@ -47,6 +50,10 @@ func (p *Process) Wait() (int, error) {
 	}
 
 	p.process.IO().Wait()
+
+	if p.stdin != nil {
+		p.stdin.Close()
+	}
 
 	return int(status.ExitCode()), nil
 }
